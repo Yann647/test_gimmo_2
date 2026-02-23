@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:test_gimmo_2/loginscreen.dart';
 import 'package:test_gimmo_2/signupscreen.dart';
+import 'package:test_gimmo_2/storage.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,6 +13,11 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   bool _isScrolled = false;
   bool _isLoggedIn = false; // À remplacer par votre gestion d'authentification
+
+  Future<void> logout() async {
+    await Storage.clearToken();
+    Navigator.pushReplacementNamed(context, '/login');
+  }
 
   @override
   Widget build(BuildContext context) {

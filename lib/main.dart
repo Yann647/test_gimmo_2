@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:test_gimmo_2/homescreen.dart';
+import 'package:test_gimmo_2/loginscreen.dart';
+import 'package:test_gimmo_2/storage.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+import 'signupscreen.dart';
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-  @override
-  Widget build(BuildContext context) => MaterialApp(
-        title: 'accueil',
-        theme: ThemeData(primarySwatch: Colors.blue),
-        home: const HomeScreen(),
-      );
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final token = await Storage.getToken();
+
+  runApp(MaterialApp(
+    home: token != null ? HomeScreen() : LoginScreen(),
+    routes: {
+      '/login': (_) => LoginScreen(),
+      '/home': (_) => HomeScreen(),
+      '/signup': (_) => SignupScreen(),
+    },
+  ));
 }

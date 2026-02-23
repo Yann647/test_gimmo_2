@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:test_gimmo_2/api_client.dart';
+import 'package:test_gimmo_2/api_errors.dart';
 import 'package:test_gimmo_2/homescreen.dart';
 import 'loginScreen.dart';
 
@@ -19,6 +21,36 @@ class _SignupScreenState extends State<SignupScreen> {
   final _passwordController = TextEditingController();
   bool _isLoading = false;
   bool _obscurePassword = true;
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _isLoading = true);
+
+    try {
+      final response = await ApiClient.post('/auth/register', {
+        'nom': _nomController.text,
+        'email': _emailController.text,
+        'password': _passwordController.text,
+      });
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Compte créé')),
+        );
+        Navigator.pushReplacementNamed(context, '/login');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(extractErrorMessage(response))),
+        );
+      }
+    } catch (_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Erreur réseau')),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
 
   String? _validateEmail(String? value) {
     if (value?.isEmpty ?? true) return 'Email requis';
@@ -154,12 +186,10 @@ class _SignupScreenState extends State<SignupScreen> {
                       labelText: 'Mot de passe',
                       prefixIcon: const Icon(Icons.lock_outline),
                       suffixIcon: IconButton(
-                        icon: Icon(_obscurePassword
-                            ? Icons.visibility
-                            : Icons.visibility_off),
-                        onPressed: () => setState(
-                            () => _obscurePassword = !_obscurePassword),
-                      ),
+                          icon: Icon(_obscurePassword
+                              ? Icons.visibility
+                              : Icons.visibility_off),
+                          onPressed: _isLoading ? null : _submit),
                       border: const OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(12))),
                     ),
