@@ -1,9 +1,11 @@
+enum ContratType { LOCATION, VENTE, BAIL }
+
 class Contrat {
   final int id;
   final DateTime datedebut;
   final DateTime datefin;
   final double montant;
-  final Enum typecontat;
+  final ContratType typecontat;
 
   const Contrat({
     required this.id,
@@ -21,5 +23,15 @@ class Contrat {
       montant: json['montant'],
       typecontat: json['typecontat'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'datedebut': datedebut,
+      'datefin': datefin,
+      'montant': montant,
+      'typecontat': typecontat.name,
+    };
   }
 }

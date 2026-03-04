@@ -1,4 +1,6 @@
-import 'package:flutter/material.dart';
+/* import 'package:flutter/material.dart';
+import 'package:test_gimmo_2/api_client.dart';
+import 'package:test_gimmo_2/api_errors.dart';
 
 class AddContratScreen extends StatefulWidget {
   const AddContratScreen({super.key});
@@ -16,10 +18,38 @@ class _AddContratScreenState extends State<AddContratScreen> {
   DateTime? _dateDebut;
   final _montantController = TextEditingController();
   final _dateController = TextEditingController(); // pour affichage
+  final _titreController = TextEditingController();
+  bool _isLoading = false;
 
   List<String> _types = []; // À charger depuis API
   List<Map<String, dynamic>> _proprietes = [];
   List<Map<String, dynamic>> _users = [];
+
+  Future<void> _submitContrat() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _isLoading = true);
+
+    try {
+      final response = await ApiClient.post('/contrats', {
+        'titre': _titreController.text,
+        'montant': int.parse(_montantController.text),
+      });
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        Navigator.pop(context, true);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(extractErrorMessage(response))),
+        );
+      }
+    } catch (_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Erreur réseau')),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
 
   @override
   void initState() {
@@ -254,3 +284,4 @@ class _AddContratScreenState extends State<AddContratScreen> {
     );
   }
 }
+ */

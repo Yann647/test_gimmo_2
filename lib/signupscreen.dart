@@ -29,7 +29,10 @@ class _SignupScreenState extends State<SignupScreen> {
     try {
       final response = await ApiClient.post('/auth/register', {
         'nom': _nomController.text,
+        'prenom': _prenomController.text,
+        'telephone': _telephoneController.text,
         'email': _emailController.text,
+        'login': _loginController.text,
         'password': _passwordController.text,
       });
 
@@ -61,8 +64,14 @@ class _SignupScreenState extends State<SignupScreen> {
 
   String? _validatePhone(String? value) {
     if (value?.isEmpty ?? true) return 'Téléphone requis';
-    if (!RegExp(r'^\d{10}$').hasMatch(value!))
-      return 'Téléphone invalide (10 chiffres)';
+
+    // ✅ SUPPRIME espaces et tirets, garde que chiffres
+    String cleanPhone = value!.replaceAll(RegExp(r'[^\d]'), '');
+
+    // ✅ Sénégal : commence par 77 ET 9 chiffres après
+    if (cleanPhone.length != 9 || !cleanPhone.startsWith('77')) {
+      return 'Téléphone invalide (ex: 776678766)';
+    }
     return null;
   }
 
@@ -70,22 +79,6 @@ class _SignupScreenState extends State<SignupScreen> {
     if (value?.isEmpty ?? true) return 'Mot de passe requis';
     if ((value?.length ?? 0) < 6) return 'Mot de passe ≥ 6 caractères';
     return null;
-  }
-
-  Future<void> _handleSignup() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() => _isLoading = true);
-      // Simulation d'inscription (remplacez par appel API/backend)
-      await Future.delayed(const Duration(seconds: 2));
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Inscription réussie ! Veuillez vous connecter.')),
-        );
-        Navigator.pop(context); // Retour à la page connexion
-        setState(() => _isLoading = false);
-      }
-    }
   }
 
   @override
@@ -186,10 +179,17 @@ class _SignupScreenState extends State<SignupScreen> {
                       labelText: 'Mot de passe',
                       prefixIcon: const Icon(Icons.lock_outline),
                       suffixIcon: IconButton(
-                          icon: Icon(_obscurePassword
-                              ? Icons.visibility
-                              : Icons.visibility_off),
-                          onPressed: _isLoading ? null : _submit),
+                        icon: Icon(_obscurePassword
+                            ? Icons.visibility
+                            : Icons.visibility_off),
+                        onPressed: _isLoading
+                            ? null
+                            : () {
+                                setState(() {
+                                  _obscurePassword = !_obscurePassword;
+                                });
+                              },
+                      ),
                       border: const OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(12))),
                     ),
@@ -200,7 +200,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: _isLoading ? null : _handleSignup,
+                      onPressed: _isLoading ? null : _submit,
                       style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12))),

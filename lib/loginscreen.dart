@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:test_gimmo_2/api_client.dart';
 import 'package:test_gimmo_2/homescreen.dart';
 import 'package:test_gimmo_2/storage.dart';
+import 'package:test_gimmo_2/user.dart';
 import 'signupscreen.dart';
 import 'dart:convert';
 
@@ -15,24 +16,35 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
   bool _obscurePassword = true;
 
   Future<void> _login() async {
+    //print("se conecter");
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
 
     try {
       final response = await ApiClient.post('/auth/login', {
-        'email': _emailController.text,
+        'login': _usernameController.text,
         'password': _passwordController.text,
       });
 
+      /*   final response2 = await ApiClient.get('/users/liste')
+
+      print('respnce $response2');
+      print(response2.statusCode);
+      print(response2.body); */
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final token = data['token'];
-        await Storage.saveToken(token);
+
+        final user = User.fromJson(data);
+
+        print("Connecté : ${user.nom} - Role: ${user.role.name}");
+
         Navigator.pushReplacementNamed(context, '/home');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -48,33 +60,11 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<void> _handleLogin() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() => _isLoading = true);
-      // Simulation d'appel API (remplacez par votre logique)
-      await Future.delayed(const Duration(seconds: 2));
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Connexion réussie !')),
-        );
-        setState(() => _isLoading = false);
-      }
-    }
-  }
-
   @override
   void dispose() {
     _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
-  }
-
-  bool vaildelongeurmotdepasse(String password) {
-    if (password.length < 6) {
-      return false;
-    } else {
-      return true;
-    }
   }
 
   @override
@@ -115,23 +105,27 @@ class _LoginScreenState extends State<LoginScreen> {
                     labelText: 'Mot de passe',
                     prefixIcon: const Icon(Icons.lock_outline),
                     suffixIcon: IconButton(
-                        icon: Icon(_obscurePassword
-                            ? Icons.visibility
-                            : Icons.visibility_off),
-                        onPressed: _isLoading ? null : _login),
+                      icon: Icon(_obscurePassword
+                          ? Icons.visibility
+                          : Icons.visibility_off),
+                      onPressed: _isLoading
+                          ? null
+                          : () {
+                              setState(() {
+                                _obscurePassword = !_obscurePassword;
+                              });
+                            },
+                    ),
                     border: const OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(12))),
                   ),
-                  validator: (value) => vaildelongeurmotdepasse(value!)
-                      ? 'Mot de passe trop court'
-                      : null,
                 ),
                 const SizedBox(height: 24),
                 SizedBox(
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: _isLoading ? null : _handleLogin,
+                    onPressed: _isLoading ? null : _login,
                     style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12))),

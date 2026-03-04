@@ -1,11 +1,15 @@
+enum Proprietetype { APPARTEMENT, MAISON, TERRAIN }
+
+enum Proprietedisponible { OUI, NON }
+
 class Propriete {
   final int id;
   final String adresse;
   final double prix;
   final String imagePath;
-  final Enum typepropriete;
+  final Proprietetype typepropriete;
   final String description;
-  final Enum disponible;
+  final Proprietedisponible disponible;
 
   const Propriete({
     required this.id,
@@ -27,5 +31,17 @@ class Propriete {
       description: json['description'],
       disponible: json['disponible'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'adresse': adresse,
+      'prix': prix,
+      'imagePath': imagePath,
+      'typepropriete': typepropriete.name,
+      'description': description,
+      'disponible': disponible.name,
+    };
   }
 }

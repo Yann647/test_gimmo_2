@@ -1,3 +1,5 @@
+enum UserRole { ADMIN, AGENT, CLIENT }
+
 class User {
   final int id;
   final String nom;
@@ -6,7 +8,7 @@ class User {
   final String email;
   final String login;
   final String password;
-  final Enum role;
+  final UserRole role;
 
   const User({
     required this.id,
@@ -27,8 +29,24 @@ class User {
       telephone: json['telephone'],
       email: json['email'],
       login: json['login'],
-      password: json['password'],
-      role: json['role'],
+      password: json['password'] ?? '',
+      role: UserRole.values.firstWhere(
+        (e) => e.name == json['role'],
+        orElse: () => UserRole.CLIENT,
+      ),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'nom': nom,
+      'prenom': prenom,
+      'telephone': telephone,
+      'email': email,
+      'login': login,
+      'password': password,
+      'role': role.name,
+    };
   }
 }
