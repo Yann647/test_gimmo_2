@@ -1,3 +1,6 @@
+import 'package:test_gimmo_2/models/propriete.dart';
+import 'package:test_gimmo_2/models/user.dart';
+
 enum ContratType { LOCATION, VENTE, BAIL }
 
 class Contrat {
@@ -5,14 +8,18 @@ class Contrat {
   final DateTime datedebut;
   final DateTime datefin;
   final double montant;
-  final ContratType typecontat;
+  final ContratType typecontrat;
+  final Propriete propriete;
+  final User client;
 
   const Contrat({
     required this.id,
     required this.datedebut,
     required this.datefin,
     required this.montant,
-    required this.typecontat,
+    required this.typecontrat,
+    required this.propriete,
+    required this.client,
   });
 
   factory Contrat.fromJson(Map<String, dynamic> json) {
@@ -21,7 +28,9 @@ class Contrat {
       datedebut: json['datedebut'],
       datefin: json['datefin'],
       montant: json['montant'],
-      typecontat: json['typecontat'],
+      typecontrat: json['typecontrat'],
+      propriete: json['propriete'],
+      client: json['client'],
     );
   }
 
@@ -31,7 +40,9 @@ class Contrat {
       'datedebut': datedebut,
       'datefin': datefin,
       'montant': montant,
-      'typecontat': typecontat.name,
+      'typecontrat': typecontrat.name,
+      'propriete': propriete.toJson(),
+      'client': client.toJson(),
     };
   }
 }

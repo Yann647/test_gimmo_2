@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:test_gimmo_2/api_client.dart';
-import 'package:test_gimmo_2/homescreen.dart';
+import 'package:test_gimmo_2/screens/homescreen.dart';
 import 'package:test_gimmo_2/storage.dart';
-import 'package:test_gimmo_2/user.dart';
+import 'package:test_gimmo_2/models/user.dart';
 import 'signupscreen.dart';
 import 'dart:convert';
 

@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:test_gimmo_2/api_client.dart';
 import 'package:test_gimmo_2/api_errors.dart';
-import 'package:test_gimmo_2/user.dart';
+import 'package:test_gimmo_2/models/user.dart';
 
 class ApiAuth {
   // INSCRIPTION

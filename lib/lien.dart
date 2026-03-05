@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:test_gimmo_2/Reservation.dart';
-import 'package:test_gimmo_2/contrat.dart';
-import 'package:test_gimmo_2/propriete.dart';
-import 'package:test_gimmo_2/user.dart';
+import 'package:test_gimmo_2/models/Reservation.dart';
+import 'package:test_gimmo_2/models/contrat.dart';
+import 'package:test_gimmo_2/models/propriete.dart';
+import 'package:test_gimmo_2/models/user.dart';
 
 Future<List<Contrat>> fetchContrat() async {
   final response =

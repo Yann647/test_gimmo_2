@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:test_gimmo_2/api_client.dart';
 import 'package:test_gimmo_2/api_errors.dart';
-import 'package:test_gimmo_2/homescreen.dart';
-import 'loginScreen.dart';
+import 'package:test_gimmo_2/screens/homescreen.dart';
+import 'package:test_gimmo_2/screens/loginscreen.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});

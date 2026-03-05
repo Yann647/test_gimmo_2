@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:test_gimmo_2/loginscreen.dart';
-import 'package:test_gimmo_2/signupscreen.dart';
+import 'package:test_gimmo_2/screens/loginscreen.dart';
+import 'package:test_gimmo_2/screens/signupscreen.dart';
 import 'package:test_gimmo_2/storage.dart';
 
 class HomeScreen extends StatefulWidget {

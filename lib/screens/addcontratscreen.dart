@@ -1,4 +1,4 @@
-/* import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:test_gimmo_2/api_client.dart';
 import 'package:test_gimmo_2/api_errors.dart';
 
@@ -284,4 +284,3 @@ class _AddContratScreenState extends State<AddContratScreen> {
     );
   }
 }
- */

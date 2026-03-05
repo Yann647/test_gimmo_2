@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:test_gimmo_2/homescreen.dart';
-import 'package:test_gimmo_2/loginscreen.dart';
+import 'package:test_gimmo_2/screens/homescreen.dart';
+import 'package:test_gimmo_2/screens/loginscreen.dart';
 import 'package:test_gimmo_2/storage.dart';
 
-import 'signupscreen.dart';
+import 'screens/signupscreen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
