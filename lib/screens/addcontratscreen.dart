@@ -32,17 +32,24 @@ class _AddContratScreenState extends State<AddContratScreen> {
     try {
       final response = await ApiClient.post('/contrats', {
         'titre': _titreController.text,
+        'typecontrat': _typeContrat,
         'montant': int.parse(_montantController.text),
+        'proprieteId': _proprieteId,
+        'userId': _userId,
+        'datedebut': _dateDebut?.toIso8601String(),
       });
 
       if (response.statusCode == 201 || response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Contrat ajouté avec succès')),
+        );
         Navigator.pop(context, true);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(extractErrorMessage(response))),
         );
       }
-    } catch (_) {
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Erreur réseau')),
       );
@@ -252,7 +259,7 @@ class _AddContratScreenState extends State<AddContratScreen> {
                         children: [
                           Expanded(
                             child: ElevatedButton(
-                              onPressed: _saveContrat,
+                              onPressed: _submitContrat,
                               style: ElevatedButton.styleFrom(
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 16),

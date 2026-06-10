@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:test_gimmo_2/models/propriete.dart';
+import 'package:test_gimmo_2/screens/contratlistscreen.dart';
 import 'package:test_gimmo_2/screens/loginscreen.dart';
+import 'package:test_gimmo_2/screens/proprietelistscreen.dart';
+import 'package:test_gimmo_2/screens/reservationlistscreen.dart';
 import 'package:test_gimmo_2/screens/signupscreen.dart';
+import 'package:test_gimmo_2/screens/userlistscreen.dart';
 import 'package:test_gimmo_2/storage.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -12,7 +17,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool _isScrolled = false;
-  bool _isLoggedIn = false; // À remplacer par votre gestion d'authentification
+  bool _isLoggedIn = true; // À remplacer par votre gestion d'authentification
 
   Future<void> logout() async {
     await Storage.clearToken();
@@ -296,44 +301,105 @@ class _HomeScreenState extends State<HomeScreen> {
                     runSpacing: 8,
                     children: [
                       _ActionButton(
-                          icon: '📄', label: 'Contrats', color: Colors.blue),
+                        icon: '📄',
+                        label: 'Contrats',
+                        color: Colors.blue,
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const ContratListScreen(),
+                          ),
+                        ),
+                      ),
                       _ActionButton(
-                          icon: '🏠', label: 'Propriétés', color: Colors.green),
+                        icon: '🏠',
+                        label: 'Propriétés',
+                        color: Colors.green,
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const Proprietelistscreen(),
+                          ),
+                        ),
+                      ),
                       _ActionButton(
-                          icon: '📅',
-                          label: 'Réservations',
-                          color: Colors.cyan),
+                        icon: '📅',
+                        label: 'Réservations',
+                        color: Colors.cyan,
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const Reservationlistscreen(),
+                          ),
+                        ),
+                      ),
                       _ActionButton(
-                          icon: '👤',
-                          label: 'Utilisateurs',
-                          color: Colors.orange),
+                        icon: '👤',
+                        label: 'Utilisateurs',
+                        color: Colors.orange,
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const Userlistscreen(),
+                          ),
+                        ),
+                      ),
                     ],
                   )
-                : const Row(
+                : Row(
                     children: [
                       Expanded(
-                          child: _ActionButton(
-                              icon: '📄',
-                              label: 'Contrats',
-                              color: Colors.blue)),
-                      SizedBox(width: 10),
+                        child: _ActionButton(
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const ContratListScreen(),
+                            ),
+                          ),
+                          icon: '📄',
+                          label: 'Contrats',
+                          color: Colors.blue,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
                       Expanded(
-                          child: _ActionButton(
-                              icon: '🏠',
-                              label: 'Propriétés',
-                              color: Colors.green)),
-                      SizedBox(width: 10),
+                        child: _ActionButton(
+                          icon: '🏠',
+                          label: 'Propriétés',
+                          color: Colors.green,
+                          onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const Proprietelistscreen(),
+                              )),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
                       Expanded(
-                          child: _ActionButton(
-                              icon: '📅',
-                              label: 'Réservations',
-                              color: Colors.cyan)),
-                      SizedBox(width: 10),
+                        child: _ActionButton(
+                          icon: '📅',
+                          label: 'Réservations',
+                          color: Colors.cyan,
+                          onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const Reservationlistscreen(),
+                              )),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
                       Expanded(
-                          child: _ActionButton(
-                              icon: '👤',
-                              label: 'Utilisateurs',
-                              color: Colors.orange)),
+                        child: _ActionButton(
+                          icon: '👤',
+                          label: 'Utilisateurs',
+                          color: Colors.orange,
+                          onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const Userlistscreen(),
+                              )),
+                        ),
+                      ),
                     ],
                   ),
 
@@ -517,17 +583,19 @@ class _ActionButton extends StatelessWidget {
   final String icon;
   final String label;
   final Color color;
+  final VoidCallback onPressed;
 
   const _ActionButton({
     required this.icon,
     required this.label,
     required this.color,
+    required this.onPressed,
   });
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: color,
         foregroundColor: Colors.white,

@@ -27,9 +27,13 @@ class Propriete {
       adresse: json['adresse'],
       prix: json['prix'],
       imagePath: json['imagePath'],
-      typepropriete: json['typepropriete'],
+      typepropriete: Proprietetype.values.firstWhere(
+        (e) => e.name == json['typePropriete'],
+      ),
       description: json['description'],
-      disponible: json['disponible'],
+      disponible: Proprietedisponible.values.firstWhere(
+        (e) => e.name == json['disponible'],
+      ),
     );
   }
 

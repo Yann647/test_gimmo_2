@@ -32,12 +32,6 @@ class _LoginScreenState extends State<LoginScreen> {
         'password': _passwordController.text,
       });
 
-      /*   final response2 = await ApiClient.get('/users/liste')
-
-      print('respnce $response2');
-      print(response2.statusCode);
-      print(response2.body); */
-
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
 

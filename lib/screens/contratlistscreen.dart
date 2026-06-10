@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:test_gimmo_2/api_client.dart';
 import 'package:test_gimmo_2/api_errors.dart';
 import 'package:test_gimmo_2/models/contrat.dart';
+import 'package:test_gimmo_2/screens/addcontratscreen.dart';
+import 'package:test_gimmo_2/screens/updatecontratscreen.dart';
 import 'dart:convert';
+
+import 'package:test_gimmo_2/screens/contratdetailscreen.dart';
 
 class ContratListScreen extends StatefulWidget {
   const ContratListScreen({super.key});
@@ -23,41 +27,69 @@ class _ContratListScreenState extends State<ContratListScreen> {
   }
 
   Future<void> _fetchContrats() async {
+    print("recuperer contrat");
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
 
     try {
-      final response = await ApiClient.get('/contrats');
+      final response = await ApiClient.get('/contrats/liste');
+      print(response.body);
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
+        print("Nombre contrats: ${data.length}");
         setState(() {
           _contrats = data.map((e) => Contrat.fromJson(e)).toList();
         });
       } else {
         setState(() => _errorMessage = extractErrorMessage(response));
       }
-    } catch (_) {
+    } catch (e) {
+      print("ERREUR: $e");
       setState(() => _errorMessage = 'Erreur réseau');
     } finally {
       setState(() => _isLoading = false);
     }
   }
 
-  void _addContrat() {
-    // Navigation vers l'écran d'ajout
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Redirection vers ajout contrat (TODO)')),
+  void _addContrat() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AddContratScreen(),
+      ),
     );
+
+    if (result == true) {
+      _fetchContrats(); // refresh liste après ajout
+    }
   }
 
-  void _editContrat(int id) {
-    // TODO: édition
-  }
+  Future<void> _deleteContrat(int id) async {
+    // Optionnel : Afficher un dialogue de confirmation ici
 
-  void _deleteContrat(int id) {
-    // TODO: suppression avec confirmation
+    try {
+      final response = await ApiClient.delete('/contrats/$id'); // Appelle l'API
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        // Succès : Retire visuellement l'élément de la liste
+        setState(() {
+          _contrats.removeWhere((contrat) => contrat.id == id);
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Contrat supprimé avec succès')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(extractErrorMessage(response))),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Erreur lors de la suppression')),
+      );
+    }
   }
 
   @override
@@ -83,15 +115,37 @@ class _ContratListScreenState extends State<ContratListScreen> {
       ),
       body: Padding(
         padding: EdgeInsets.all(isMobile ? 8.0 : 16.0),
-        child: Card(
-          elevation: 2,
-          child: _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : _contrats.isEmpty
-                  ? _buildEmptyState(isMobile)
-                  : isMobile
-                      ? _buildMobileList()
-                      : _buildTabletDesktopList(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // 🔥 BOUTON AJOUT ICI
+            ElevatedButton.icon(
+              onPressed: _addContrat,
+              icon: const Icon(Icons.add),
+              label: const Text("Ajouter un contrat"),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            // 🔽 LISTE
+            Expanded(
+              child: Card(
+                elevation: 2,
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _errorMessage != null
+                        ? Center(child: Text(_errorMessage!))
+                        : _contrats.isEmpty
+                            ? _buildEmptyState(isMobile)
+                            : isMobile
+                                ? _buildMobileList()
+                                : _buildTabletDesktopList(),
+              ),
+            ),
+          ],
         ),
       ),
       floatingActionButton: isMobile
@@ -140,52 +194,81 @@ class _ContratListScreenState extends State<ContratListScreen> {
   }
 
   Widget _buildMobileList() {
-    return ListView.builder(
-      padding: const EdgeInsets.all(8),
-      itemCount: _contrats.length,
-      itemBuilder: (context, index) {
-        final contrat = _contrats[index];
-        return Card(
-          margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 0),
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor: Colors.blue.shade100,
-              child: Text(
-                contrat.typecontrat.name.substring(0, 1).toUpperCase(),
-                style: const TextStyle(fontWeight: FontWeight.bold),
+    return RefreshIndicator(
+        onRefresh: _fetchContrats, // Appelle la même API GET
+        child: ListView.builder(
+          itemCount: _contrats.length,
+          itemBuilder: (context, index) {
+            final contrat = _contrats[index];
+            return Card(
+              margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 0),
+              child: ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: Colors.blue.shade100,
+                  child: Text(
+                    contrat.typecontrat.name
+                        .toString()
+                        .toString()
+                        .substring(0, 1)
+                        .toUpperCase(),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                title: Text(
+                  '${contrat.typecontrat.name} - ${contrat.montant} FCFA',
+                  style: const TextStyle(fontWeight: FontWeight.w500),
+                ),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 4),
+                    Text('📅 ${contrat.datedebut.toString().split(' ')[0]}'),
+                    Text('🏠 ${contrat.propriete.adresse}'),
+                    Text('👤 ${contrat.client.nom} ${contrat.client.prenom}'),
+                  ],
+                ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon:
+                          const Icon(Icons.edit, color: Colors.blue, size: 20),
+                      onPressed: () async {
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                UpdateContratScreen(contrat: contrat),
+                          ),
+                        );
+
+                        if (result == true) {
+                          _fetchContrats();
+                        }
+                      },
+                    ),
+                    IconButton(
+                      icon:
+                          const Icon(Icons.delete, color: Colors.red, size: 20),
+                      onPressed: () => _deleteContrat(contrat.id),
+                    ),
+                  ],
+                ),
+                onTap: () {
+                  // Ouvrir la page de détail au clic
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          ContratDetailScreen(contrat: contrat),
+                    ),
+                  );
+                },
+                isThreeLine: true,
               ),
-            ),
-            title: Text(
-              '${contrat.typecontrat} - ${contrat.montant} FCFA',
-              style: const TextStyle(fontWeight: FontWeight.w500),
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 4),
-                Text('📅 ${contrat.datedebut.toString().split(' ')[0]}'),
-                Text('🏠 ${contrat.propriete.adresse}'),
-                Text('👤 ${contrat.client}'),
-              ],
-            ),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.edit, color: Colors.blue, size: 20),
-                  onPressed: () => _editContrat(contrat.id),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red, size: 20),
-                  onPressed: () => _deleteContrat(contrat.id),
-                ),
-              ],
-            ),
-            isThreeLine: true,
-          ),
-        );
-      },
-    );
+            );
+          },
+        ));
   }
 
   Widget _buildTabletDesktopList() {
@@ -224,7 +307,7 @@ class _ContratListScreenState extends State<ContratListScreen> {
               return DataRow(
                 cells: [
                   DataCell(Text('${contrat.id}')),
-                  DataCell(Text(contrat.typecontrat.name)),
+                  DataCell(Text(contrat.typecontrat.name.toString())),
                   DataCell(Text(contrat.datedebut.toString().split(' ')[0])),
                   DataCell(Text('${contrat.montant} FCFA')),
                   DataCell(Text(contrat.propriete.adresse)),
@@ -234,7 +317,19 @@ class _ContratListScreenState extends State<ContratListScreen> {
                     children: [
                       IconButton(
                         icon: const Icon(Icons.edit, color: Colors.blue),
-                        onPressed: () => _editContrat(contrat.id),
+                        onPressed: () async {
+                          final result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  UpdateContratScreen(contrat: contrat),
+                            ),
+                          );
+
+                          if (result == true) {
+                            _fetchContrats();
+                          }
+                        },
                         tooltip: 'Modifier',
                       ),
                       IconButton(
